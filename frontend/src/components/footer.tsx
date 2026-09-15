@@ -9,7 +9,7 @@ const platforms = [
 ];
 
 const legal = [
-  { href: "/about", label: "About12" },
+  { href: "/about", label: "About" },
   { href: "/privacy-policy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
 ];
