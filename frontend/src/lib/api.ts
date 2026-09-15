@@ -10,6 +10,7 @@ export interface VideoInfo {
   duration?: number | null;
   channel?: string;
   webpageUrl?: string;
+  site?: string;
 }
 
 export type DownloadStatusValue = "pending" | "downloading" | "completed" | "failed";

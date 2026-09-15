@@ -160,7 +160,7 @@ export default function Home() {
 
       <section className="w-full text-center">
         <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-          Grab any YouTube video.
+          Download any video.
         </h1>
         <p className="mx-auto mt-3 max-w-md text-balance text-[15px] leading-relaxed text-muted">
           Paste a link, pick a format and quality, and it&apos;s yours. Free, no sign-up.
@@ -169,6 +169,21 @@ export default function Home() {
 
       <div className="mt-8 w-full">
         <UrlForm onSubmit={handleValidate} disabled={phase === "validating" || phase === "downloading"} />
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted/60">
+          <span>YouTube</span>
+          <span className="text-muted/30">·</span>
+          <span>TikTok</span>
+          <span className="text-muted/30">·</span>
+          <span>Instagram</span>
+          <span className="text-muted/30">·</span>
+          <span>Twitter / X</span>
+          <span className="text-muted/30">·</span>
+          <span>Vimeo</span>
+          <span className="text-muted/30">·</span>
+          <span>Dailymotion</span>
+          <span className="text-muted/30">·</span>
+          <span className="text-accent-bright/80">and 1000+ more</span>
+        </div>
       </div>
 
       <div aria-live="polite">
@@ -215,6 +230,7 @@ export default function Home() {
             onDownload={handleDownload}
             onReset={handleReset}
             savedFile={savedFile}
+            site={info.site}
           />
         </div>
       )}

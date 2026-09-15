@@ -45,8 +45,8 @@ from downloader import (
     DownloadError,
     DownloadService,
     InvalidUrlError,
-    NotYouTubeError,
     PrivateVideoError,
+    UnsupportedUrlError,
     classify_error,
 )
 
@@ -67,8 +67,8 @@ def _env_cors_origins() -> list[str]:
 
 
 _MESSAGES = {
-    "INVALID_URL": "That link isn't a valid YouTube URL.",
-    "NOT_YOUTUBE": "Only YouTube links are supported.",
+    "INVALID_URL": "That link isn't a valid URL.",
+    "NOT_SUPPORTED": "This URL isn't supported. Try a video from YouTube, TikTok, Instagram, Twitter, Vimeo, or 1000+ other sites.",
     "PRIVATE_VIDEO": "This video is private and can't be downloaded.",
     "AGE_RESTRICTED": "This video is age-restricted and can't be downloaded.",
     "TIMEOUT": "The download timed out. Try a smaller video or a lower quality.",
@@ -388,12 +388,43 @@ def create_app(
             "uptime": round(time.time() - app.state.started_at),
         }
 
+    @app.get("/api/supported-sites")
+    def supported_sites():
+        return {
+            "sites": [
+                {"name": "YouTube", "domain": "youtube.com"},
+                {"name": "TikTok", "domain": "tiktok.com"},
+                {"name": "Instagram", "domain": "instagram.com"},
+                {"name": "Twitter / X", "domain": "x.com"},
+                {"name": "Vimeo", "domain": "vimeo.com"},
+                {"name": "Dailymotion", "domain": "dailymotion.com"},
+                {"name": "Twitch", "domain": "twitch.tv"},
+                {"name": "Facebook", "domain": "facebook.com"},
+                {"name": "Reddit", "domain": "reddit.com"},
+                {"name": "Twitch Clips", "domain": "clips.twitch.tv"},
+                {"name": "SoundCloud", "domain": "soundcloud.com"},
+                {"name": "Bandcamp", "domain": "bandcamp.com"},
+                {"name": "Flickr", "domain": "flickr.com"},
+                {"name": "Streamable", "domain": "streamable.com"},
+                {"name": "Rumble", "domain": "rumble.com"},
+                {"name": "Odysee", "domain": "odysee.com"},
+                {"name": "Bilibili", "domain": "bilibili.com"},
+                {"name": "Niconico", "domain": "nicovideo.jp"},
+                {"name": "Kick", "domain": "kick.com"},
+                {"name": "Patreon", "domain": "patreon.com"},
+            ],
+            "total_extractors": 1000,
+            "extractor_list_url": "https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/extractor/_extractors.py",
+        }
+
     @app.post("/api/validate")
     def validate(request: Request, body: ValidateRequest):
         try:
             info = service.fetch_info(body.url)
-        except (InvalidUrlError, NotYouTubeError):
+        except InvalidUrlError:
             return _error_response("INVALID_URL", _MESSAGES["INVALID_URL"], 400)
+        except UnsupportedUrlError:
+            return _error_response("NOT_SUPPORTED", _MESSAGES["NOT_SUPPORTED"], 400)
         except PrivateVideoError:
             return _error_response("PRIVATE_VIDEO", _MESSAGES["PRIVATE_VIDEO"], 400)
         except AgeRestrictedError:
@@ -412,6 +443,7 @@ def create_app(
             "duration": info.duration,
             "channel": info.channel,
             "webpageUrl": info.webpage_url,
+            "site": info.site,
         }
 
     def _kick_off_download(task_id: str) -> None:

@@ -6,8 +6,8 @@ from downloader import (
     AgeRestrictedError,
     DownloadService,
     InvalidUrlError,
-    NotYouTubeError,
     PrivateVideoError,
+    UnsupportedUrlError,
 )
 
 
@@ -17,6 +17,7 @@ def test_fetch_info_returns_metadata(service):
     assert info.thumbnail.startswith("https://")
     assert info.duration == 754
     assert info.channel == "Example Channel"
+    assert info.site == "Youtube"
 
 
 def test_fetch_info_rejects_non_http_string(service):
@@ -24,9 +25,27 @@ def test_fetch_info_rejects_non_http_string(service):
         service.fetch_info("not a url at all")
 
 
-def test_fetch_info_rejects_non_youtube_host(service):
-    with pytest.raises(NotYouTubeError):
-        service.fetch_info("https://vimeo.com/123456")
+def test_fetch_info_raises_unsupported_url_error(service):
+    with pytest.raises(UnsupportedUrlError):
+        service.fetch_info("https://example.com/video")
+
+
+def test_fetch_info_accepts_non_youtube_url(service):
+    info = service.fetch_info("https://vimeo.com/123456")
+    assert info.title == "A Fancy Video"
+    assert info.site == "Vimeo"
+
+
+def test_fetch_info_accepts_tiktok_url(service):
+    info = service.fetch_info("https://www.tiktok.com/@user/video/123")
+    assert info.title == "A Fancy Video"
+    assert info.site == "TikTok"
+
+
+def test_fetch_info_accepts_instagram_url(service):
+    info = service.fetch_info("https://www.instagram.com/reel/ABC123/")
+    assert info.title == "A Fancy Video"
+    assert info.site == "Instagram"
 
 
 def test_fetch_info_raises_private_video_error(service):

@@ -1,6 +1,6 @@
-# YT Downloader
+# Video Downloader
 
-A YouTube video downloader web app with a split, fully free deployment:
+A video downloader web app that supports YouTube, TikTok, Instagram, and 1000+ other sites via yt-dlp.
 
 | Layer    | Stack                                                        | Hosting        | Cost |
 | -------- | ------------------------------------------------------------ | -------------- | ---- |
@@ -8,6 +8,26 @@ A YouTube video downloader web app with a split, fully free deployment:
 | Backend  | Python FastAPI + yt-dlp + ffmpeg (Docker)                    | Render (free)  | $0   |
 
 No paid services, no API keys, no credit card required.
+
+## Supported Platforms
+
+This app supports **1000+ video sites** through yt-dlp's extractor system. Major supported platforms include:
+
+- YouTube
+- TikTok
+- Instagram (Reels, Stories, Posts)
+- Twitter / X
+- Vimeo
+- Dailymotion
+- Twitch
+- Facebook
+- Reddit
+- SoundCloud
+- Bandcamp
+- Bilibili
+- And many more...
+
+See the [full list of supported extractors](https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/extractor/_extractors.py) for the complete set.
 
 ## How it works
 
@@ -41,7 +61,7 @@ domain (see `CORS_ORIGINS` below).
 └── backend/             → deploy to Render (Docker)
     ├── main.py          FastAPI app (endpoints, tasks, rate limit, cleanup)
     ├── downloader.py    yt-dlp wrapper (info + download + format selection)
-    ├── tests/           pytest suite (35 tests, uses a fake extractor)
+    ├── tests/           pytest suite (42 tests, uses a fake extractor)
     ├── Dockerfile       python:3.11-slim + ffmpeg + pinned yt-dlp
     ├── render.yaml      Render service definition (free plan)
     └── requirements.txt
@@ -54,7 +74,8 @@ Base URL is the Render service URL (e.g. `https://yt-downloader-api.onrender.com
 | Method | Path                                    | Body / Params                          | Success                                     | Errors |
 | ------ | --------------------------------------- | -------------------------------------- | ------------------------------------------- | ------ |
 | GET    | `/api/health`                           | —                                      | `200 {"status":"ok","uptime":N}`            | —      |
-| POST   | `/api/validate`                         | `{"url":"https://youtu.be/…"}`         | `200 {valid,title,thumbnail,duration,channel}` | `400` `403` `502` |
+| GET    | `/api/supported-sites`                  | —                                      | `200 {sites: [{name, domain}], total_extractors, extractor_list_url}` | —      |
+| POST   | `/api/validate`                         | `{"url":"https://youtube.com/…"}`      | `200 {valid,title,thumbnail,duration,channel,site}` | `400` `403` `502` |
 | POST   | `/api/download`                         | `{"url","format":"mp4","quality":"720"}` | `202 {"taskId":"…"}`                        | `422` `429` |
 | GET    | `/api/download/{taskId}/status`         | —                                      | `200 {taskId,status,progress,filename?,error?}` | `404` |
 | GET    | `/api/download/{taskId}/file`           | —                                      | `200` stream + `Content-Disposition: attachment` | `404` `409` |
@@ -93,17 +114,16 @@ uv pip install -r requirements-dev.txt        # or: pip install -r requirements-
 uvicorn main:app --reload                      # http://localhost:8000
 ```
 
-Run the test suite (35 tests, a fake yt-dlp — no network, no flakiness):
+Run the test suite (42 tests, a fake yt-dlp — no network, no flakiness):
 
 ```bash
 cd backend
 pytest                                        # or: ../.venv/Scripts/python.exe -m pytest
 ```
 
-The suite covers the whole contract: health, validate (valid/random/non-YouTube/
-private/age-restricted), the async download lifecycle (pending → downloading →
+The suite covers the whole contract: health, validate (valid/random/unsupported/private/age-restricted), the async download lifecycle (pending → downloading →
 completed/failed), timeout marking, file streaming, `404`/`409` cases, body
-validation (`422`), rate limiting, and CORS.
+validation (`422`), rate limiting, CORS, and supported-sites endpoint.
 
 ### Frontend
 

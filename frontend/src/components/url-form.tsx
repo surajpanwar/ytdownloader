@@ -30,11 +30,11 @@ export function UrlForm({ onSubmit, disabled }: UrlFormProps) {
         <input
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          placeholder="Paste a YouTube link"
+          placeholder="Paste a video link"
           inputMode="url"
           autoComplete="off"
           spellCheck={false}
-          aria-label="YouTube video URL"
+          aria-label="Video URL"
           className="h-10 w-full min-w-0 flex-1 border-0 bg-transparent px-3 text-[15px] text-white placeholder:text-muted/70 focus:outline-none disabled:opacity-50"
         />
         <Button

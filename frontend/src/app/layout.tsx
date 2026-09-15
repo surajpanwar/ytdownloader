@@ -11,9 +11,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Grab — YouTube video downloader",
+  title: "Grab — Video Downloader",
   description:
-    "Paste a YouTube link, pick a format and quality, and download the video. Free, no sign-up.",
+    "Paste a video link from YouTube, TikTok, Instagram, or 1000+ other sites, pick a format and quality, and download. Free, no sign-up.",
 };
 
 export const viewport: Viewport = {

@@ -67,11 +67,38 @@ def test_validate_rejects_random_string(tmp_path):
     assert resp.json()["error"]["code"] == "INVALID_URL"
 
 
-def test_validate_rejects_non_youtube_host(tmp_path):
+def test_validate_accepts_non_youtube_host(tmp_path):
     client = make_client(tmp_path)
     resp = client.post("/api/validate", json={"url": "https://vimeo.com/123"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["valid"] is True
+    assert body["site"] == "Vimeo"
+
+
+def test_validate_accepts_tiktok_url(tmp_path):
+    client = make_client(tmp_path)
+    resp = client.post("/api/validate", json={"url": "https://www.tiktok.com/@user/video/123"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["valid"] is True
+    assert body["site"] == "TikTok"
+
+
+def test_validate_accepts_instagram_url(tmp_path):
+    client = make_client(tmp_path)
+    resp = client.post("/api/validate", json={"url": "https://www.instagram.com/reel/ABC123/"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["valid"] is True
+    assert body["site"] == "Instagram"
+
+
+def test_validate_unsupported_site_returns_error(tmp_path):
+    client = make_client(tmp_path)
+    resp = client.post("/api/validate", json={"url": "https://example.com/video"})
     assert resp.status_code == 400
-    assert resp.json()["error"]["code"] == "INVALID_URL"
+    assert resp.json()["error"]["code"] == "NOT_SUPPORTED"
 
 
 def test_validate_private_video(tmp_path):
@@ -297,3 +324,17 @@ def test_cors_preflight_allowed(tmp_path):
     )
     assert resp.status_code == 200
     assert resp.headers.get("access-control-allow-origin") == "http://localhost:3000"
+
+
+# --- supported sites ---
+
+
+def test_supported_sites_returns_list(tmp_path):
+    client = make_client(tmp_path)
+    resp = client.get("/api/supported-sites")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert "sites" in body
+    assert len(body["sites"]) >= 20
+    assert body["total_extractors"] == 1000
+    assert "extractor_list_url" in body

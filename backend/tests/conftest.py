@@ -13,6 +13,7 @@ VALID_INFO = {
     "channel": "Example Channel",
     "uploader": "Example Channel",
     "webpage_url": "https://www.youtube.com/watch?v=abc123",
+    "extractor": "Youtube",
 }
 
 
@@ -33,6 +34,8 @@ class FakeYDL:
             raise RuntimeError("Sign in to confirm your age. This video may be inappropriate for some users.")
         if "broken" in url:
             raise RuntimeError("Unsupported URL: something unexpected blew up.")
+        if "example.com" in url:
+            raise RuntimeError("Unsupported URL: example.com")
         if download:
             if "slow" in url:
                 time.sleep(2)
@@ -44,7 +47,17 @@ class FakeYDL:
             for hook in self.opts.get("progress_hooks", []):
                 hook({"status": "downloading", "downloaded_bytes": 50, "total_bytes": 100})
                 hook({"status": "finished"})
-        return dict(VALID_INFO, webpage_url=url)
+        # Determine extractor based on URL
+        info = dict(VALID_INFO, webpage_url=url)
+        if "tiktok.com" in url:
+            info["extractor"] = "TikTok"
+        elif "instagram.com" in url:
+            info["extractor"] = "Instagram"
+        elif "vimeo.com" in url:
+            info["extractor"] = "Vimeo"
+        elif "twitter.com" in url or "x.com" in url:
+            info["extractor"] = "Twitter"
+        return info
 
 
 class FakeYtDlp:

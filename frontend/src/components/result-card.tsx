@@ -76,6 +76,7 @@ interface ResultCardProps {
   onDownload: () => void;
   onReset: () => void;
   savedFile?: { taskId: string; filename?: string } | null;
+  site?: string;
 }
 
 export function ResultCard({
@@ -93,6 +94,7 @@ export function ResultCard({
   onDownload,
   onReset,
   savedFile,
+  site,
 }: ResultCardProps) {
   const isAudio = format === "mp3" || format === "m4a";
   const durationLabel = formatDuration(duration);
@@ -123,7 +125,14 @@ export function ResultCard({
       </div>
 
       <div className="p-4 sm:p-5">
-        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-white">{title}</h3>
+        <div className="flex items-start gap-2">
+          <h3 className="line-clamp-2 flex-1 text-base font-semibold leading-snug text-white">{title}</h3>
+          {site && (
+            <span className="shrink-0 rounded-md bg-accent/20 px-2 py-0.5 text-xs font-medium text-accent-bright">
+              {site}
+            </span>
+          )}
+        </div>
         <p className="mt-1 truncate text-sm text-muted">{channel}</p>
 
         <div className="mt-5 space-y-4">

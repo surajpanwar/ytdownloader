@@ -26,10 +26,6 @@ VALID_FORMATS = ("mp4", "mp3", "webm", "m4a")
 VALID_QUALITIES = ("1080", "720", "480", "360")
 
 _HTTP_URL_RE = re.compile(r"^https?://", re.I)
-_YOUTUBE_HOST_RE = re.compile(
-    r"^https?://(?:(?:www|m|music)\.)?(?:youtube\.com|youtu\.be)(?:/|$)",
-    re.I,
-)
 
 
 class DownloadError(Exception):
@@ -42,8 +38,8 @@ class InvalidUrlError(DownloadError):
     code = "INVALID_URL"
 
 
-class NotYouTubeError(DownloadError):
-    code = "NOT_YOUTUBE"
+class UnsupportedUrlError(DownloadError):
+    code = "NOT_SUPPORTED"
 
 
 class PrivateVideoError(DownloadError):
@@ -65,6 +61,7 @@ class VideoInfo:
     duration: int
     channel: str
     webpage_url: str
+    site: str
 
 
 @dataclass
@@ -76,6 +73,9 @@ class VideoFile:
 
 
 _ERROR_HINTS = (
+    # Unsupported sites: yt-dlp raises "Unsupported URL: <url>" when no
+    # extractor matches, so this must come before the generic DownloadError.
+    (UnsupportedUrlError, ("unsupported url",)),
     # Age checks come first: yt-dlp's age-gate message ("Sign in to confirm
     # your age") shares the "sign in to" prefix with the private-video error.
     (AgeRestrictedError, ("confirm your age", "age-restricted", "mature content")),
@@ -91,15 +91,6 @@ def classify_error(exc: Exception) -> DownloadError:
         if any(fragment in lowered for fragment in fragments):
             return err_cls(message)
     return DownloadError(message)
-
-
-def is_likely_youtube_url(url: str) -> bool:
-    """True when `url` looks like an http(s) YouTube link we can attempt."""
-    if not url or not isinstance(url, str):
-        return False
-    if not _HTTP_URL_RE.match(url):
-        return False
-    return bool(_YOUTUBE_HOST_RE.match(url))
 
 
 class DownloadService:
@@ -120,10 +111,10 @@ class DownloadService:
     # ------------------------------------------------------------------ info
     def fetch_info(self, url: str) -> VideoInfo:
         """Resolve metadata for `url` without downloading anything."""
-        if not is_likely_youtube_url(url):
-            if not _HTTP_URL_RE.match(url):
-                raise InvalidUrlError("The input is not a valid URL.")
-            raise NotYouTubeError("Only YouTube links are supported.")
+        if not url or not isinstance(url, str):
+            raise InvalidUrlError("The input is not a valid URL.")
+        if not _HTTP_URL_RE.match(url):
+            raise InvalidUrlError("The input is not a valid URL.")
 
         opts = {**self._base_opts(), "skip_download": True}
         try:
@@ -143,12 +134,14 @@ class DownloadService:
             or info.get("uploader_id")
             or "Unknown channel"
         )
+        site = info.get("extractor") or info.get("ie_key") or "Unknown"
         return VideoInfo(
             title=title,
             thumbnail=thumbnail,
             duration=duration,
             channel=channel,
             webpage_url=info.get("webpage_url") or url,
+            site=site,
         )
 
     # --------------------------------------------------------------- options
