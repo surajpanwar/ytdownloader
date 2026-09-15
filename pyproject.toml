@@ -1,0 +1,14 @@
+[project]
+name = "yt-downloader"
+version = "1.0.0"
+description = "YouTube video downloader: Next.js frontend (Vercel) + FastAPI/yt-dlp backend (Render)"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.uv]
+package = false
+
+# The backend is its own package (see backend/pyproject.toml) and is deployed
+# to Render via backend/Dockerfile using backend/requirements.txt.
+# Run the backend locally from the backend/ directory:
+#   cd backend && uv run pytest

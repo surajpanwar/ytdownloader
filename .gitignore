@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Env files (never commit real values)
+.env
+.env*.local
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info
+build/
+dist/
+
+# Misc
+.DS_Store
+*.tsbuildinfo
+*.pem
+next-env.d.ts

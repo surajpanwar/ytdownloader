@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: yt-downloader-api
+    runtime: docker
+    plan: free
+    rootDir: backend
+    region: oregon
+    healthCheckPath: /api/health
+    healthCheckTimeout: 180
+    autoDeploy: true
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://your-app.vercel.app
+      - key: YTDL_TIMEOUT_SECONDS
+        value: "300"
+      - key: YTDL_FILE_MAX_AGE_SECONDS
+        value: "1800"
