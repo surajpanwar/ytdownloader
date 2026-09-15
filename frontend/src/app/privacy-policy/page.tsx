@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Footer } from "@/components/footer";
+
 export const metadata: Metadata = {
-  title: "Privacy Policy — Grab",
-  description: "Privacy policy for the Grab video downloader.",
+  title: "Privacy Policy - AnyVideo Downloader",
+  description:
+    "Privacy Policy for AnyVideo Downloader, a free video downloader. Learn how we handle your data.",
+  openGraph: {
+    title: "Privacy Policy - AnyVideo Downloader",
+    description:
+      "Privacy Policy for AnyVideo Downloader, a free video downloader. Learn how we handle your data.",
+    url: "https://grabvideo.app/privacy-policy",
+    siteName: "AnyVideo Downloader",
+    type: "website",
+  },
 };
 
 export default function PrivacyPolicy() {
@@ -104,6 +115,8 @@ export default function PrivacyPolicy() {
           </p>
         </section>
       </div>
+
+      <Footer />
     </main>
   );
 }

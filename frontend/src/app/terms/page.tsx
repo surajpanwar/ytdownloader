@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Footer } from "@/components/footer";
+
 export const metadata: Metadata = {
-  title: "Terms of Service — Grab",
-  description: "Terms of service for the Grab video downloader.",
+  title: "Terms of Service - AnyVideo Downloader",
+  description: "Terms of Service for AnyVideo Downloader, a free video downloader for 1000+ platforms.",
+  openGraph: {
+    title: "Terms of Service - AnyVideo Downloader",
+    description: "Terms of Service for AnyVideo Downloader, a free video downloader for 1000+ platforms.",
+    url: "https://grabvideo.app/terms",
+    siteName: "AnyVideo Downloader",
+    type: "website",
+  },
 };
 
 export default function Terms() {
@@ -112,6 +121,8 @@ export default function Terms() {
           </p>
         </section>
       </div>
+
+      <Footer />
     </main>
   );
 }
