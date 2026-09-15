@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -238,9 +239,25 @@ export default function Home() {
       <RecentDownloads items={recent} onSelect={handleValidate} onClear={handleClearRecent} />
 
       <footer className="mt-12 w-full border-t border-edge pt-6 text-center">
+        <nav className="mb-4 flex items-center justify-center gap-4 text-xs text-muted">
+          <Link href="/about" className="transition-colors hover:text-white">
+            About
+          </Link>
+          <span className="text-muted/30">·</span>
+          <Link
+            href="/privacy-policy"
+            className="transition-colors hover:text-white"
+          >
+            Privacy
+          </Link>
+          <span className="text-muted/30">·</span>
+          <Link href="/terms" className="transition-colors hover:text-white">
+            Terms
+          </Link>
+        </nav>
         <p className="mx-auto max-w-md text-xs leading-relaxed text-muted">
-          Download only content you own or have permission to use. Files are generated on demand
-          and removed from the server within 30 minutes.
+          Download only content you own or have permission to use. Files are
+          generated on demand and removed from the server within 30 minutes.
         </p>
       </footer>
     </main>
