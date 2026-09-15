@@ -27,6 +27,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{__html: "(function(s){s.dataset.zone='11806588',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))"}} />
+      </head>
       <body className={`${inter.variable} min-h-screen`}>
         {children}
         <Toaster />
